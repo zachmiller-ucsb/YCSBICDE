@@ -44,6 +44,10 @@ public class RocksDBClient extends DB {
 
   static final String PROPERTY_ROCKSDB_DIR = "rocksdb.dir";
   static final String PROPERTY_ROCKSDB_OPTIONS_FILE = "rocksdb.optionsfile";
+  static final String PROPERTY_ROCKSDB_CACHE_SIZE = "rocksdb.cacheSize";
+  static final String PROPERTY_ROCKSDB_COMPACTION_STYLE = "rocksdb.compactionStyle";
+  static final String PROPERTY_ROCKSDB_MAX_BYTES_FOR_LEVEL_MULTIPLIER = "rocksdb.maxBytesForLevelMultiplier";
+  static final String PROPERTY_ROCKSDB_AUTUMN_C = "rocksdb.autumnC";
   private static final String COLUMN_FAMILY_NAMES_FILENAME = "CF_NAMES";
 
   private static final Logger LOGGER = LoggerFactory.getLogger(RocksDBClient.class);
@@ -135,8 +139,7 @@ public class RocksDBClient extends DB {
     final List<ColumnFamilyDescriptor> cfDescriptors = new ArrayList<>();
 
     for(final String cfName : cfNames) {
-      final ColumnFamilyOptions cfOptions = new ColumnFamilyOptions()
-          .optimizeLevelStyleCompaction();
+      final ColumnFamilyOptions cfOptions = new ColumnFamilyOptions();
       final ColumnFamilyDescriptor cfDescriptor = new ColumnFamilyDescriptor(
           cfName.getBytes(UTF_8),
           cfOptions
@@ -149,7 +152,6 @@ public class RocksDBClient extends DB {
 
     if(cfDescriptors.isEmpty()) {
       final Options options = new Options()
-          .optimizeLevelStyleCompaction()
           .setCreateIfMissing(true)
           .setCreateMissingColumnFamilies(true)
           .setIncreaseParallelism(rocksThreads)
