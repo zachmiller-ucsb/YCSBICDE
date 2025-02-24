@@ -1,0 +1,42 @@
+loading data, c=0.6, T=5
+[OVERALL], Throughput(ops/sec), 17733.192590894803
+[OVERALL], Throughput(ops/sec), 675.0512532664043
+running workloadc
+[OVERALL], Throughput(ops/sec), 724.0757354256226
+[OVERALL], Throughput(ops/sec), 723.9095750071667
+running workloadb
+[OVERALL], Throughput(ops/sec), 960.9184843240563
+[OVERALL], Throughput(ops/sec), 993.5775149434058
+running workloadd
+[OVERALL], Throughput(ops/sec), 2928.051908504234
+[OVERALL], Throughput(ops/sec), 916.3215188945497
+running workloade
+[OVERALL], Throughput(ops/sec), 388.7530628881942
+[OVERALL], Throughput(ops/sec), 806.4971409676352
+running workloadf
+[OVERALL], Throughput(ops/sec), 970.7833056336497
+[OVERALL], Throughput(ops/sec), 1027.465171499349
+running workloada
+[OVERALL], Throughput(ops/sec), 1023.559263569581
+[OVERALL], Throughput(ops/sec), 1128.7866559356683
+loading data, c=0.8, T=5
+[OVERALL], Throughput(ops/sec), 12654.83987514735
+[OVERALL], Throughput(ops/sec), 600.6907944135756
+running workloadc
+[OVERALL], Throughput(ops/sec), 687.3083698351353
+[OVERALL], Throughput(ops/sec), 687.4586235840931
+running workloadb
+[OVERALL], Throughput(ops/sec), 918.3166521113477
+[OVERALL], Throughput(ops/sec), 952.3120231297544
+running workloadd
+[OVERALL], Throughput(ops/sec), 2795.5137595187243
+[OVERALL], Throughput(ops/sec), 898.9693316612504
+running workloade
+[OVERALL], Throughput(ops/sec), 357.149745030797
+[OVERALL], Throughput(ops/sec), 793.281225333912
+running workloadf
+[OVERALL], Throughput(ops/sec), 945.38599637539
+[OVERALL], Throughput(ops/sec), 1138.3972277750709
+running workloada
+[OVERALL], Throughput(ops/sec), 1040.2742162834122
+[OVERALL], Throughput(ops/sec), 1107.9166181953146
