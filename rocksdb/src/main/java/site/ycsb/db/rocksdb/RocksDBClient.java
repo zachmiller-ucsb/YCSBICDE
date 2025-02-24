@@ -45,7 +45,6 @@ public class RocksDBClient extends DB {
   static final String PROPERTY_ROCKSDB_DIR = "rocksdb.dir";
   static final String PROPERTY_ROCKSDB_OPTIONS_FILE = "rocksdb.optionsfile";
   static final String PROPERTY_ROCKSDB_CACHE_SIZE = "rocksdb.cacheSize";
-  static final String PROPERTY_ROCKSDB_COMPACTION_STYLE = "rocksdb.compactionStyle";
   static final String PROPERTY_ROCKSDB_MAX_BYTES_FOR_LEVEL_MULTIPLIER = "rocksdb.maxBytesForLevelMultiplier";
   static final String PROPERTY_ROCKSDB_AUTUMN_C = "rocksdb.autumnC";
   private static final String COLUMN_FAMILY_NAMES_FILENAME = "CF_NAMES";
@@ -101,12 +100,16 @@ public class RocksDBClient extends DB {
       Files.createDirectories(rocksDbDir);
     }
 
-    final DBOptions options = new DBOptions();
+    final DBOptions options = initDBOptions();
     final List<ColumnFamilyDescriptor> cfDescriptors = new ArrayList<>();
     final List<ColumnFamilyHandle> cfHandles = new ArrayList<>();
 
     RocksDB.loadLibrary();
-    OptionsUtil.loadOptionsFromFile(optionsFile.toAbsolutePath().toString(), Env.getDefault(), options, cfDescriptors);
+
+    ConfigOptions configOptions = new ConfigOptions();
+    OptionsUtil.loadOptionsFromFile(configOptions,
+                                    optionsFile.toAbsolutePath().toString(),
+                                    options, cfDescriptors);
     dbOptions = options;
 
     final RocksDB db = RocksDB.open(options, rocksDbDir.toAbsolutePath().toString(), cfDescriptors, cfHandles);
@@ -120,6 +123,109 @@ public class RocksDBClient extends DB {
     }
 
     return db;
+  }
+
+  private DBOptions initDBOptions() {
+    final int rocksThreads = Runtime.getRuntime().availableProcessors() * 2;
+
+    Integer cacheSize = Integer.valueOf(
+        getProperties().getProperty(PROPERTY_ROCKSDB_CACHE_SIZE));
+    Double maxBytesForLevelMultiplier = Double.valueOf(
+        getProperties().getProperty(PROPERTY_ROCKSDB_MAX_BYTES_FOR_LEVEL_MULTIPLIER));
+    Double autumnC = Double.valueOf(
+        getProperties().getProperty(PROPERTY_ROCKSDB_AUTUMN_C));
+    String logMsg = String.format("Setting Rocksdb properties:\n" +
+                                  "rocksdb.cacheSize: %d\n" +
+                                  "rocksdb.maxBytesForLevelMultiplier: %f\n" +
+                                  "rocksdb.autumnC: %f",
+                                  cacheSize,
+                                  maxBytesForLevelMultiplier,
+                                  autumnC);
+    System.out.println("initDBOptions: " + logMsg);
+
+    final DBOptions options = new DBOptions()
+        .setCreateIfMissing(true)
+        .setCreateMissingColumnFamilies(true)
+        .setIncreaseParallelism(rocksThreads)
+        .setMaxBackgroundCompactions(rocksThreads)
+        .setInfoLogLevel(InfoLogLevel.DEBUG_LEVEL)
+        .setUseDirectIoForFlushAndCompaction(true)
+        .setUseDirectReads(true);
+
+    return options;
+  }
+
+  private ColumnFamilyOptions initColumnFamilyOptions() {
+    Integer cacheSize = Integer.valueOf(
+        getProperties().getProperty(PROPERTY_ROCKSDB_CACHE_SIZE));
+    Double maxBytesForLevelMultiplier = Double.valueOf(
+        getProperties().getProperty(PROPERTY_ROCKSDB_MAX_BYTES_FOR_LEVEL_MULTIPLIER));
+    Double autumnC = Double.valueOf(
+        getProperties().getProperty(PROPERTY_ROCKSDB_AUTUMN_C));
+    String logMsg = String.format("Setting Rocksdb properties:\n" +
+                                  "rocksdb.cacheSize: %d\n" +
+                                  "rocksdb.maxBytesForLevelMultiplier: %f\n" +
+                                  "rocksdb.autumnC: %f",
+                                  cacheSize,
+                                  maxBytesForLevelMultiplier,
+                                  autumnC);
+    System.out.println("initColumnFamilyOptions: " + logMsg);
+
+    RocksDB.loadLibrary();
+    Cache cache = new LRUCache(cacheSize);
+    BlockBasedTableConfig tableConfig = new BlockBasedTableConfig();
+    tableConfig.setBlockCache(cache);
+    tableConfig.setCacheIndexAndFilterBlocks(true);
+    tableConfig.setCacheIndexAndFilterBlocksWithHighPriority(true);
+
+    final ColumnFamilyOptions options = new ColumnFamilyOptions()
+        .setMaxBytesForLevelMultiplier(maxBytesForLevelMultiplier)
+        .setTableFormatConfig(tableConfig)
+        .setCompressionType(CompressionType.NO_COMPRESSION)
+        .setAutumnC(autumnC);
+
+    return options;
+  }
+
+  private Options initOptions() {
+    final int rocksThreads = Runtime.getRuntime().availableProcessors() * 2;
+
+    Integer cacheSize = Integer.valueOf(
+        getProperties().getProperty(PROPERTY_ROCKSDB_CACHE_SIZE));
+    Double maxBytesForLevelMultiplier = Double.valueOf(
+        getProperties().getProperty(PROPERTY_ROCKSDB_MAX_BYTES_FOR_LEVEL_MULTIPLIER));
+    Double autumnC = Double.valueOf(
+        getProperties().getProperty(PROPERTY_ROCKSDB_AUTUMN_C));
+    String logMsg = String.format("Setting Rocksdb properties:\n" +
+                                  "rocksdb.cacheSize: %d\n" +
+                                  "rocksdb.maxBytesForLevelMultiplier: %f\n" +
+                                  "rocksdb.autumnC: %f",
+                                  cacheSize,
+                                  maxBytesForLevelMultiplier,
+                                  autumnC);
+    System.out.println("initOptions: " + logMsg);
+
+    RocksDB.loadLibrary();
+    Cache cache = new LRUCache(cacheSize);
+    BlockBasedTableConfig tableConfig = new BlockBasedTableConfig();
+    tableConfig.setBlockCache(cache);
+    tableConfig.setCacheIndexAndFilterBlocks(true);
+    tableConfig.setCacheIndexAndFilterBlocksWithHighPriority(true);
+
+    final Options options = new Options()
+        .setCreateIfMissing(true)
+        .setCreateMissingColumnFamilies(true)
+        .setIncreaseParallelism(rocksThreads)
+        .setMaxBackgroundCompactions(rocksThreads)
+        .setInfoLogLevel(InfoLogLevel.DEBUG_LEVEL)
+        .setMaxBytesForLevelMultiplier(maxBytesForLevelMultiplier)
+        .setTableFormatConfig(tableConfig)
+        .setCompressionType(CompressionType.NO_COMPRESSION)
+        .setUseDirectIoForFlushAndCompaction(true)
+        .setUseDirectReads(true)
+        .setAutumnC(autumnC);
+
+    return options;
   }
 
   /**
@@ -139,7 +245,7 @@ public class RocksDBClient extends DB {
     final List<ColumnFamilyDescriptor> cfDescriptors = new ArrayList<>();
 
     for(final String cfName : cfNames) {
-      final ColumnFamilyOptions cfOptions = new ColumnFamilyOptions();
+      final ColumnFamilyOptions cfOptions = initColumnFamilyOptions();
       final ColumnFamilyDescriptor cfDescriptor = new ColumnFamilyDescriptor(
           cfName.getBytes(UTF_8),
           cfOptions
@@ -148,24 +254,12 @@ public class RocksDBClient extends DB {
       cfDescriptors.add(cfDescriptor);
     }
 
-    final int rocksThreads = Runtime.getRuntime().availableProcessors() * 2;
-
     if(cfDescriptors.isEmpty()) {
-      final Options options = new Options()
-          .setCreateIfMissing(true)
-          .setCreateMissingColumnFamilies(true)
-          .setIncreaseParallelism(rocksThreads)
-          .setMaxBackgroundCompactions(rocksThreads)
-          .setInfoLogLevel(InfoLogLevel.INFO_LEVEL);
+      final Options options = initOptions();
       dbOptions = options;
       return RocksDB.open(options, rocksDbDir.toAbsolutePath().toString());
     } else {
-      final DBOptions options = new DBOptions()
-          .setCreateIfMissing(true)
-          .setCreateMissingColumnFamilies(true)
-          .setIncreaseParallelism(rocksThreads)
-          .setMaxBackgroundCompactions(rocksThreads)
-          .setInfoLogLevel(InfoLogLevel.INFO_LEVEL);
+      final DBOptions options = initDBOptions();
       dbOptions = options;
 
       final List<ColumnFamilyHandle> cfHandles = new ArrayList<>();
