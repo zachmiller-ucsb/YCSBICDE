@@ -125,15 +125,19 @@ public class RocksDBClient extends DB {
     return db;
   }
 
+  private static String getValueOrDefault(String value) {
+    return (value != null && !value.isEmpty()) ? value : "1";
+  }
+
   private DBOptions initDBOptions() {
     final int rocksThreads = Runtime.getRuntime().availableProcessors() * 2;
 
     Integer cacheSize = Integer.valueOf(
-        getProperties().getProperty(PROPERTY_ROCKSDB_CACHE_SIZE));
+        getValueOrDefault(getProperties().getProperty(PROPERTY_ROCKSDB_CACHE_SIZE)));
     Double maxBytesForLevelMultiplier = Double.valueOf(
-        getProperties().getProperty(PROPERTY_ROCKSDB_MAX_BYTES_FOR_LEVEL_MULTIPLIER));
+        getValueOrDefault(getProperties().getProperty(PROPERTY_ROCKSDB_MAX_BYTES_FOR_LEVEL_MULTIPLIER)));
     Double autumnC = Double.valueOf(
-        getProperties().getProperty(PROPERTY_ROCKSDB_AUTUMN_C));
+        getValueOrDefault(getProperties().getProperty(PROPERTY_ROCKSDB_AUTUMN_C)));
     String logMsg = String.format("Setting Rocksdb properties:\n" +
                                   "rocksdb.cacheSize: %d\n" +
                                   "rocksdb.maxBytesForLevelMultiplier: %f\n" +
@@ -157,11 +161,11 @@ public class RocksDBClient extends DB {
 
   private ColumnFamilyOptions initColumnFamilyOptions() {
     Integer cacheSize = Integer.valueOf(
-        getProperties().getProperty(PROPERTY_ROCKSDB_CACHE_SIZE));
+        getValueOrDefault(getProperties().getProperty(PROPERTY_ROCKSDB_CACHE_SIZE)));
     Double maxBytesForLevelMultiplier = Double.valueOf(
-        getProperties().getProperty(PROPERTY_ROCKSDB_MAX_BYTES_FOR_LEVEL_MULTIPLIER));
+        getValueOrDefault(getProperties().getProperty(PROPERTY_ROCKSDB_MAX_BYTES_FOR_LEVEL_MULTIPLIER)));
     Double autumnC = Double.valueOf(
-        getProperties().getProperty(PROPERTY_ROCKSDB_AUTUMN_C));
+        getValueOrDefault(getProperties().getProperty(PROPERTY_ROCKSDB_AUTUMN_C)));
     String logMsg = String.format("Setting Rocksdb properties:\n" +
                                   "rocksdb.cacheSize: %d\n" +
                                   "rocksdb.maxBytesForLevelMultiplier: %f\n" +
@@ -191,11 +195,11 @@ public class RocksDBClient extends DB {
     final int rocksThreads = Runtime.getRuntime().availableProcessors() * 2;
 
     Integer cacheSize = Integer.valueOf(
-        getProperties().getProperty(PROPERTY_ROCKSDB_CACHE_SIZE));
+        getValueOrDefault(getProperties().getProperty(PROPERTY_ROCKSDB_CACHE_SIZE)));
     Double maxBytesForLevelMultiplier = Double.valueOf(
-        getProperties().getProperty(PROPERTY_ROCKSDB_MAX_BYTES_FOR_LEVEL_MULTIPLIER));
+        getValueOrDefault(getProperties().getProperty(PROPERTY_ROCKSDB_MAX_BYTES_FOR_LEVEL_MULTIPLIER)));
     Double autumnC = Double.valueOf(
-        getProperties().getProperty(PROPERTY_ROCKSDB_AUTUMN_C));
+        getValueOrDefault(getProperties().getProperty(PROPERTY_ROCKSDB_AUTUMN_C)));
     String logMsg = String.format("Setting Rocksdb properties:\n" +
                                   "rocksdb.cacheSize: %d\n" +
                                   "rocksdb.maxBytesForLevelMultiplier: %f\n" +
